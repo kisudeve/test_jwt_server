@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://test-jwt-roan.vercel.app",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -32,7 +32,7 @@ const ACCESS_TOKEN_SECRET = "access-secret";
 const REFRESH_TOKEN_SECRET = "refresh-secret";
 
 const ACCESS_TOKEN_EXPIRES_IN = "5s";
-const REFRESH_TOKEN_EXPIRES_IN = "30s";
+const REFRESH_TOKEN_EXPIRES_IN = "10s";
 
 function signAccessToken(userId) {
   return jwt.sign({ sub: userId }, ACCESS_TOKEN_SECRET, {
@@ -53,19 +53,22 @@ function setAuthCookies(res, userId) {
 
   res.cookie("access_token", accessToken, {
     httpOnly: true,
-    secure: true, // 실제 서비스에서는 true + HTTPS 권장
-    sameSite: "none",
+    secure: false, // 실제 서비스에서는 true + HTTPS 권장
+    sameSite: "lax",
     path: "/",
   });
 
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: false,
+    sameSite: "lax",
     path: "/",
   });
 }
 
+app.get("/", (req, res) => {
+  res.json("Hello, World");
+});
 // 회원가입
 app.post("/auth/signup", (req, res) => {
   const { email, password, name } = req.body || {};
@@ -164,8 +167,8 @@ function authMiddleware(req, res, next) {
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       path: "/",
     });
 
@@ -223,8 +226,8 @@ function optionalAuthMiddleware(req, res, next) {
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       path: "/",
     });
 
@@ -260,8 +263,8 @@ app.post("/auth/refresh", (req, res) => {
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       path: "/",
     });
 
@@ -295,6 +298,7 @@ app.post("/auth/logout", (req, res) => {
 });
 
 // 글 관련 API
+
 // 글 작성 (인증된 사용자만)
 app.post("/posts", authMiddleware, (req, res) => {
   const { title, content } = req.body || {};
