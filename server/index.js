@@ -31,8 +31,8 @@ const posts = [];
 const ACCESS_TOKEN_SECRET = "access-secret";
 const REFRESH_TOKEN_SECRET = "refresh-secret";
 
-const ACCESS_TOKEN_EXPIRES_IN = "5s";
-const REFRESH_TOKEN_EXPIRES_IN = "10s";
+const ACCESS_TOKEN_EXPIRES_IN = "15d";
+const REFRESH_TOKEN_EXPIRES_IN = "20d";
 
 function signAccessToken(userId) {
   return jwt.sign({ sub: userId }, ACCESS_TOKEN_SECRET, {
