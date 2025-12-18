@@ -56,6 +56,7 @@ function setAuthCookies(res, userId) {
     secure: true, // 실제 서비스에서는 true + HTTPS 권장
     sameSite: "none",
     path: "/",
+    maxAge: 15 * 60 * 1000, // 15분
   });
 
   res.cookie("refresh_token", refreshToken, {
@@ -63,6 +64,7 @@ function setAuthCookies(res, userId) {
     secure: true,
     sameSite: "none",
     path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
   });
 }
 
@@ -170,6 +172,7 @@ function authMiddleware(req, res, next) {
       secure: true,
       sameSite: "none",
       path: "/",
+      maxAge: 15 * 60 * 1000, // 15분
     });
 
     req.user = { id: userId };
@@ -229,6 +232,7 @@ function optionalAuthMiddleware(req, res, next) {
       secure: true,
       sameSite: "none",
       path: "/",
+      maxAge: 15 * 60 * 1000, // 15분
     });
 
     req.user = { id: userId };
