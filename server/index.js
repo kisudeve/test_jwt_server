@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://test-jwt-roan.vercel.app",
     credentials: true,
   })
 );
@@ -53,15 +53,15 @@ function setAuthCookies(res, userId) {
 
   res.cookie("access_token", accessToken, {
     httpOnly: true,
-    secure: false, // 실제 서비스에서는 true + HTTPS 권장
-    sameSite: "lax",
+    secure: true, // 실제 서비스에서는 true + HTTPS 권장
+    sameSite: "none",
     path: "/",
   });
 
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
     path: "/",
   });
 }
@@ -167,8 +167,8 @@ function authMiddleware(req, res, next) {
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
     });
 
@@ -226,8 +226,8 @@ function optionalAuthMiddleware(req, res, next) {
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
     });
 
@@ -263,8 +263,8 @@ app.post("/auth/refresh", (req, res) => {
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
     });
 
