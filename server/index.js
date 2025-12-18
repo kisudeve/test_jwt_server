@@ -31,8 +31,8 @@ const posts = [];
 const ACCESS_TOKEN_SECRET = "access-secret";
 const REFRESH_TOKEN_SECRET = "refresh-secret";
 
-const ACCESS_TOKEN_EXPIRES_IN = "15d";
-const REFRESH_TOKEN_EXPIRES_IN = "20d";
+const ACCESS_TOKEN_EXPIRES_IN = "10s";
+const REFRESH_TOKEN_EXPIRES_IN = "30s";
 
 function signAccessToken(userId) {
   return jwt.sign({ sub: userId }, ACCESS_TOKEN_SECRET, {
@@ -56,7 +56,6 @@ function setAuthCookies(res, userId) {
     secure: true, // 실제 서비스에서는 true + HTTPS 권장
     sameSite: "none",
     path: "/",
-    maxAge: 15 * 60 * 1000, // 15분
   });
 
   res.cookie("refresh_token", refreshToken, {
@@ -64,7 +63,6 @@ function setAuthCookies(res, userId) {
     secure: true,
     sameSite: "none",
     path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
   });
 
   return { accessToken, refreshToken };
