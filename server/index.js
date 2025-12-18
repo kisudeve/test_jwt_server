@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://test-jwt-roan.vercel.app",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -120,7 +120,7 @@ app.post("/auth/login", (req, res) => {
   }
 
   setAuthCookies(res, user.id);
-  res.json({ ok: true });
+  res.json({ accessToken, refreshToken });
 });
 
 // 인증 미들웨어 (access 만료 시 refresh로 재발급 후 통과)
