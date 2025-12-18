@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://test-jwt-roan.vercel.app",
     credentials: true,
   })
 );
@@ -66,6 +66,8 @@ function setAuthCookies(res, userId) {
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
   });
+
+  return { accessToken, refreshToken };
 }
 
 app.get("/", (req, res) => {
@@ -119,7 +121,7 @@ app.post("/auth/login", (req, res) => {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  setAuthCookies(res, user.id);
+  const { accessToken, refreshToken } = setAuthCookies(res, user.id);
   res.json({ accessToken, refreshToken });
 });
 
