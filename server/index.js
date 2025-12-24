@@ -10,7 +10,6 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://test-jwt-roan.vercel.app",
-    // origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -147,6 +146,9 @@ function authMiddleware(req, res, next) {
       console.log("Access token expired, trying refresh...");
     }
   }
+
+  // access가 없거나 만료된 상태 → refresh 확인
+  return res.status(401).json({ message: "Invalid Acc token" });
 }
 
 // 선택적 인증 미들웨어 (실패해도 401 없이 진행)
