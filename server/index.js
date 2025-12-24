@@ -136,7 +136,7 @@ function authMiddleware(req, res, next) {
   }
 
   // access가 없거나 만료된 상태 → refresh 확인
-  return res.status(401).json({ message: "Invalid Acc token" });
+  return res.status(401).json({ message: "Invalid Acc token", accessToken });
 }
 
 // 토큰 재발급 (별도 엔드포인트 사용 시)
