@@ -9,7 +9,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://test-jwt-roan.vercel.app",
+    origin: "https://www.sucoding.store",
+    // origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -51,26 +52,13 @@ function setAuthCookies(res, userId) {
   const accessToken = signAccessToken(userId);
   const refreshToken = signRefreshToken(userId);
 
-  // res.cookie("access_token", accessToken, {
-  //   httpOnly: true,
-  //   secure: true, // 실제 서비스에서는 true + HTTPS 권장
-  //   sameSite: "none",
-  //   path: "/",
-  // });
-
-  // res.cookie("refresh_token", refreshToken, {
-  //   httpOnly: true,
-  //   secure: true,
-  //   sameSite: "none",
-  //   path: "/",
-  // });
-
   return { accessToken, refreshToken };
 }
 
 app.get("/", (req, res) => {
   res.json("Hello, World");
 });
+
 // 회원가입
 app.post("/auth/signup", (req, res) => {
   const { email, password, name } = req.body || {};
@@ -151,65 +139,6 @@ function authMiddleware(req, res, next) {
   return res.status(401).json({ message: "Invalid Acc token" });
 }
 
-// 선택적 인증 미들웨어 (실패해도 401 없이 진행)
-function optionalAuthMiddleware(req, res, next) {
-  const accessToken = req.cookies.access_token;
-  const refreshToken = req.cookies.refresh_token;
-
-  if (!accessToken && !refreshToken) {
-    return next();
-  }
-
-  if (accessToken) {
-    try {
-      const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
-      req.user = { id: payload.sub };
-      return next();
-    } catch (e) {
-      if (e.name !== "TokenExpiredError") {
-        console.error("optionalAuth access verify error:", e);
-        return next();
-      }
-      console.log("optionalAuth: access expired, trying refresh...");
-    }
-  }
-
-  if (!refreshToken) {
-    return next();
-  }
-
-  try {
-    const refreshPayload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-    const userId = refreshPayload.sub;
-
-    const user = users.find((u) => u.id === userId);
-    if (!user) {
-      res.clearCookie("access_token", { path: "/" });
-      res.clearCookie("refresh_token", { path: "/" });
-      return next();
-    }
-
-    const newAccessToken = signAccessToken(userId);
-
-    // res.cookie("access_token", newAccessToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "none",
-    //   path: "/",
-    //   maxAge: 15 * 60 * 1000, // 15분
-    // });
-
-    req.user = { id: userId };
-    return next();
-  } catch (e) {
-    console.error("optionalAuth refresh verify error:", e);
-
-    res.clearCookie("access_token", { path: "/" });
-    res.clearCookie("refresh_token", { path: "/" });
-    return next();
-  }
-}
-
 // 토큰 재발급 (별도 엔드포인트 사용 시)
 app.post("/auth/refresh", (req, res) => {
   const { refreshToken } = req.body; // 또는 req.cookies.refresh_token 사용 가능
@@ -228,14 +157,6 @@ app.post("/auth/refresh", (req, res) => {
     }
 
     const newAccessToken = signAccessToken(userId);
-
-    // res.cookie("access_token", newAccessToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "none",
-    //   path: "/",
-    // });
-
     return res.json({ accessToken: newAccessToken });
   } catch (e) {
     console.error("Refresh token verify error:", e);
