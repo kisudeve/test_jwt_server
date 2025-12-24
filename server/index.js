@@ -9,7 +9,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://test-jwt-roan.vercel.app",
+    // origin: "https://test-jwt-roan.vercel.app",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -145,45 +146,6 @@ function authMiddleware(req, res, next) {
       }
       console.log("Access token expired, trying refresh...");
     }
-  }
-
-  // access가 없거나 만료된 상태 → refresh 확인
-  if (!refreshToken) {
-    return res.status(401).json({ message: "No refresh token" });
-  }
-
-  try {
-    const refreshPayload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-    const userId = refreshPayload.sub;
-
-    const user = users.find((u) => u.id === userId);
-    if (!user) {
-      res.clearCookie("access_token", { path: "/" });
-      res.clearCookie("refresh_token", { path: "/" });
-      return res
-        .status(401)
-        .json({ message: "User not found for refresh token" });
-    }
-
-    const newAccessToken = signAccessToken(userId);
-
-    res.cookie("access_token", newAccessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: 15 * 60 * 1000, // 15분
-    });
-
-    req.user = { id: userId };
-    return next();
-  } catch (e) {
-    console.error("Refresh token verify error:", e);
-
-    res.clearCookie("access_token", { path: "/" });
-    res.clearCookie("refresh_token", { path: "/" });
-
-    return res.status(401).json({ message: "Invalid refresh token" });
   }
 }
 
