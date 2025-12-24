@@ -122,6 +122,8 @@ function authMiddleware(req, res, next) {
 
   // access token 먼저 검증
   if (accessToken) {
+    console.log(console.log(new Date().toLocaleString()));
+    console.log(accessToken);
     try {
       const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
       req.user = { id: payload.sub };
