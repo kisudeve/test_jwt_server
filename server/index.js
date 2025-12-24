@@ -32,7 +32,7 @@ const ACCESS_TOKEN_SECRET = "access-secret";
 const REFRESH_TOKEN_SECRET = "refresh-secret";
 
 const ACCESS_TOKEN_EXPIRES_IN = "10s";
-const REFRESH_TOKEN_EXPIRES_IN = "30s";
+const REFRESH_TOKEN_EXPIRES_IN = "50s";
 
 function signAccessToken(userId) {
   return jwt.sign({ sub: userId }, ACCESS_TOKEN_SECRET, {
@@ -51,19 +51,19 @@ function setAuthCookies(res, userId) {
   const accessToken = signAccessToken(userId);
   const refreshToken = signRefreshToken(userId);
 
-  res.cookie("access_token", accessToken, {
-    httpOnly: true,
-    secure: true, // 실제 서비스에서는 true + HTTPS 권장
-    sameSite: "none",
-    path: "/",
-  });
+  // res.cookie("access_token", accessToken, {
+  //   httpOnly: true,
+  //   secure: true, // 실제 서비스에서는 true + HTTPS 권장
+  //   sameSite: "none",
+  //   path: "/",
+  // });
 
-  res.cookie("refresh_token", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-  });
+  // res.cookie("refresh_token", refreshToken, {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: "none",
+  //   path: "/",
+  // });
 
   return { accessToken, refreshToken };
 }
@@ -191,13 +191,13 @@ function optionalAuthMiddleware(req, res, next) {
 
     const newAccessToken = signAccessToken(userId);
 
-    res.cookie("access_token", newAccessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: 15 * 60 * 1000, // 15분
-    });
+    // res.cookie("access_token", newAccessToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "none",
+    //   path: "/",
+    //   maxAge: 15 * 60 * 1000, // 15분
+    // });
 
     req.user = { id: userId };
     return next();
@@ -229,12 +229,12 @@ app.post("/auth/refresh", (req, res) => {
 
     const newAccessToken = signAccessToken(userId);
 
-    res.cookie("access_token", newAccessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    });
+    // res.cookie("access_token", newAccessToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "none",
+    //   path: "/",
+    // });
 
     return res.json({ accessToken: newAccessToken });
   } catch (e) {
