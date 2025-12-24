@@ -158,6 +158,7 @@ function authMiddleware(req, res, next) {
       sameSite: "none",
       path: "/",
       maxAge: 15 * 60 * 1000, // 15분
+      domain: ".sucoding.store",
     });
 
     req.user = { id: userId };
