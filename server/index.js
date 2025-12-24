@@ -122,7 +122,7 @@ function authMiddleware(req, res, next) {
 
   // access token 먼저 검증
   if (accessToken) {
-    console.log(console.log(new Date().toLocaleString()));
+    console.log(new Date().toLocaleString());
     console.log(accessToken);
     try {
       const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
@@ -137,8 +137,39 @@ function authMiddleware(req, res, next) {
     }
   }
 
-  // access가 없거나 만료된 상태 → refresh 확인
-  return res.status(401).json({ message: "Invalid Acc token", accessToken });
+  try {
+    const refreshPayload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+    const userId = refreshPayload.sub;
+
+    const user = users.find((u) => u.id === userId);
+    if (!user) {
+      res.clearCookie("access_token", { path: "/" });
+      res.clearCookie("refresh_token", { path: "/" });
+      return res
+        .status(401)
+        .json({ message: "User not found for refresh token" });
+    }
+
+    const newAccessToken = signAccessToken(userId);
+
+    res.cookie("access_token", newAccessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 15 * 60 * 1000, // 15분
+    });
+
+    req.user = { id: userId };
+    return next();
+  } catch (e) {
+    console.error("Refresh token verify error:", e);
+
+    res.clearCookie("access_token", { path: "/" });
+    res.clearCookie("refresh_token", { path: "/" });
+
+    return res.status(401).json({ message: "Invalid refresh token" });
+  }
 }
 
 // 토큰 재발급 (별도 엔드포인트 사용 시)
